@@ -1,0 +1,511 @@
+<div class="container">
+  <h2>Product Search</h2>
+  <form (submit)="onSubmit()" [formGroup]="productSearchForm" class="form-row">
+  <div class="row">
+    <div class="col-md-6">
+      <table class="table table-dark">
+        <tbody>
+          <tr>
+            <td>
+              <label for="keyword">Keyword</label>
+            </td>
+            <td>
+              <input type="text" class="form-control" id="keyword" formControlName="keyword" placeholder="Enter Product Name (eg. iPhone 8)" required [ngClass]="{ 'is-invalid': productSearchForm.get('keyword')?.hasError('containsOnlySpaces') && productSearchForm.get('keyword')?.touched }">
+              <div *ngIf="productSearchForm.get('keyword')?.hasError('required') && productSearchForm.get('keyword')?.touched || productSearchForm.get('keyword')?.hasError('containsOnlySpaces') && productSearchForm.get('keyword')?.touched" class="invalid-feedback">
+                Keyword is required.
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="category">Category</label>
+            </td>
+            <td>
+              <select class="form-control" id="category" formControlName="category" required>
+                <option value="all" selected>All Categories</option>
+                <option value="550">Art</option>
+                <option value="2984">Baby</option>
+                <option value="267">Books</option>
+                <option value="11450">Clothing, Shoes & Accessories</option>
+                <option value="58058">Computers/Tablets & Networking</option>
+                <option value="26395">Health & Beauty</option>
+                <option value="11233">Music</option>
+                <option value="1249">Video Games & Consoles</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Condition</label>
+            </td>
+            <td>
+                <input type="checkbox" class="form-check-input" id="conditionNew" formControlName="conditionNew">
+                &nbsp;&nbsp;
+                <label class="form-check-label" for="conditionNew">New</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" class="form-check-input" id="conditionUsed" formControlName="conditionUsed">
+                &nbsp;&nbsp;
+                <label class="form-check-label" for="conditionUsed">Used</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" class="form-check-input" id="conditionUnspecified" formControlName="conditionUnspecified">
+                &nbsp;&nbsp;
+                <label class="form-check-label" for="conditionUnspecified">Unspecified</label>
+
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Shipping Options</label>
+            </td>
+            <td>
+                <input type="checkbox" class="form-check-input" id="localPickup" formControlName="localPickup">
+                &nbsp;&nbsp;
+                <label class="form-check-label" for="localPickup">Local Pickup</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+
+                <input type="checkbox" class="form-check-input" id="freeShipping" formControlName="freeShipping">
+                &nbsp;&nbsp;
+                <label class="form-check-label" for="freeShipping">Free Shipping</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="distance">Distance (Miles)</label>
+            </td>
+            <td>
+              <input type="number" class="form-control" id="distance" formControlName="distance" required>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>From</label>
+            </td>
+            <td>
+              <div class="form-check">
+                <input type="radio" class="form-check-input" id="currloc" formControlName="from" value="currloc" (change)="toggleFromText()">
+                <label class="form-check-label" for="currloc">Current Location</label>
+              </div>
+              <div class="form-check">
+                <input type="radio" class="form-check-input" id="otherloc" formControlName="from" value="otherloc" (change)="toggleFromText()">
+                <label class="form-check-label" for="otherloc">Other. Please specify zip code:</label>
+      
+                <input type="text" class="form-control" id="fromText" formControlName="fromText" [disabled]="isFromTextDisabled()" pattern="^\d{5}$" required [ngClass]="{ 'is-invalid': productSearchForm.get('fromText')?.hasError('containsOnlySpaces') && productSearchForm.get('fromText')?.touched }"/>
+                <div *ngIf="productSearchForm.get('fromText')?.hasError('required') && productSearchForm.get('fromText')?.touched || productSearchForm.get('fromText')?.hasError('pattern') && productSearchForm.get('fromText')?.touched || productSearchForm.get('fromText')?.hasError('containsOnlySpaces') && productSearchForm.get('fromText')?.touched" class="invalid-feedback">
+                  Please enter a valid 5-digit zip code.
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button type="submit" class="btn btn-primary" [disabled]="!productSearchForm.valid">Search</button>
+              <button type="button" class="btn btn-secondary" (click)="clearForm()">Clear</button>
+            </td>
+            <td>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</form>
+
+
+<button class="btn btn-primary" (click)="showResults()">Results</button>
+<button class="btn btn-primary" (click)="showWishList()">Wish List</button>
+
+
+  <div *ngIf="ebayData.findItemsAdvancedResponse[0].searchResult[0].item && ebayData.findItemsAdvancedResponse[0].searchResult[0].item.length > 0">
+    
+    <div class="row" *ngIf="showResultsTable">
+      <!-- <div class="col-12 text-right"> -->
+      <div class="col-md-6 text-right">
+        <button [disabled]="!detailsButtonEnabled" (click)="showProductDetailsTable()" class="btn btn-light">Details ></button>
+      </div>
+
+    <table class="table table-dark table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th>#</th>
+          <th>Image</th>
+          <th>Title</th>
+          <th>Price</th>
+          <th>Shipping</th>
+          <th>Zip</th>
+          <th>Wish List</th>
+        </tr>
+      </thead>
+      <tbody>
+    <ng-container *ngFor="let item of ebayData.findItemsAdvancedResponse[0].searchResult[0].item | paginate: { itemsPerPage: 10, currentPage: p }; let i = index">
+    <tr [class.highlighted-row]="detailsButtonEnabled">
+      <td>{{ getSerialNumber(i) }}</td>
+      <td><img [src]="item.galleryURL[0]" alt="Item Image" width="100" height="100" /></td>
+      <td (click)="fetchProductInfo(item)">
+        <a href="javascript:void(0)" class="product-link" data-toggle="tooltip" [title]="item.title[0]">{{ item.title[0] | slice:0:35 }}{{ item.title[0].length > 35 ? '...' : '' }}</a>
+      </td>
+      <td>${{ item.sellingStatus[0].currentPrice[0].__value__ || 'N/A' }}</td>
+      <td>
+        <ng-container *ngIf="item.shippingInfo[0].shippingServiceCost[0].__value__ === '0.0'">Free Shipping</ng-container>
+        <ng-container *ngIf="item.shippingInfo[0].shippingServiceCost[0].__value__ !== '0.0'">${{ item.shippingInfo[0].shippingServiceCost[0].__value__ }}</ng-container>
+      </td>
+      <td>{{ item.postalCode || 'N/A' }}</td>
+      <td>
+        <button class="btn btn-light" (click)="toggleWishlistState(i)">
+            <i class="material-icons orange600">{{ isWishlistItem(getSerialNumber(i)-1) ? 'remove_shopping_cart' : 'add_shopping_cart' }}</i>
+        </button>
+      </td>
+    </tr>
+  </ng-container>
+  </tbody>
+</table>
+<pagination-controls (pageChange)="p = $event"></pagination-controls>
+</div>
+</div>
+
+  <div class="row" *ngIf="showDetailsTable">
+
+    {{ productTitle }}
+
+    <div class="col-12 text-right">
+      <button class="btn btn-light" (click)="goBackToResults()">List ></button>
+    </div>
+
+    <div class="navbar justify-content-end">
+      <button class="btn" (click)="showSection('product')">Product</button>
+      <button class="btn" (click)="showSection('photos')">Photos</button>
+      <button class="btn" (click)="showSection('shipping')">Shipping</button>
+      <button class="btn" (click)="showSection('seller')">Seller</button>
+      <button class="btn" (click)="showSection('similarItems')">Similar Items</button>
+    </div>
+
+    <div *ngIf="currentSection === 'product'">
+      <table class="table table-dark table-striped">
+        <tbody>
+          <tr>
+            <td>Product Images</td>
+            <td><a (click)="openImageModal()">Product Images</a></td>
+          </tr>
+          <tr>
+            <td>Price</td>
+            <td>${{ productPrice }}</td>
+          </tr>
+          <tr>
+            <td>Location</td>
+            <td>{{ productLocation }}</td>
+          </tr>
+          <tr>
+            <td>Return Policy</td>
+            <td>{{ productReturnsAccepted }} Within {{ productReturnsWithin }}</td>
+          </tr>
+          <tr *ngFor="let itemSpecific of productItemSpecifics">
+            <td>{{ itemSpecific.Name }}</td><td> {{ itemSpecific.Value[0] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="currentSection === 'photos'">
+
+      <div *ngIf="currentSection === 'photos'">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="photo">
+              <img [src]="photos1" alt="Image 1" style="height: 200px;">
+            </div>
+            <div class="photo">
+              <img [src]="photos2" alt="Image 2" style="height: 250px;">
+            </div>
+            <div class="photo">
+              <img [src]="photos3" alt="Image 3" style="height: 180px;">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="photo">
+              <img [src]="photos4" alt="Image 4" style="height: 230px;">
+            </div>
+            <div class="photo">
+              <img [src]="photos5" alt="Image 5" style="height: 210px;">
+            </div>
+            <div class="photo">
+              <img [src]="photos6" alt="Image 6" style="height: 260px;">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="photo">
+              <img [src]="photos7" alt="Image 7" style="height: 280px;">
+            </div>
+            <div class="photo">
+              <img [src]="photos8" alt="Image 8" style="height: 240px;">
+            </div>
+          </div>
+        </div>
+    </div>
+
+    </div>
+
+    <div *ngIf="currentSection === 'shipping'">
+      <table class="table table-dark table-striped">
+        <tbody>
+          <tr>
+            <td>Shipping Cost</td>
+            <td><a (click)="openImageModal()">Product Images</a></td>
+          </tr>
+          <tr>
+            <td>Shipping Locations</td>
+            <td>${{ productPrice }}</td>
+          </tr>
+          <tr>
+            <td>Handling Time</td>
+            <td>{{ productLocation }}</td>
+          </tr>
+          <tr>
+            <td>Expedited Shipping</td>
+            <td>{{ productReturnsAccepted }} Within {{ productReturnsWithin }}</td>
+          </tr>
+          <tr>
+            <td>One Day Shipping</td>
+            <td>{{ productLocation }}</td>
+          </tr>
+          <tr>
+            <td>Return Accepted</td>
+            <td>{{ productLocation }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="currentSection === 'seller'">
+      <table class="table table-dark table-striped">
+        <tbody>
+          <tr>
+            <td>Feedback Score</td>
+          </tr>
+          <tr>
+            <td>Feedback Score</td>
+            <td><a (click)="openImageModal()">Product Images</a></td>
+          </tr>
+          <tr>
+            <td>Popularity</td>
+            <td>${{ productPrice }}</td>
+          </tr>
+          <tr>
+            <td>Feedback Rating Star</td>
+            <td>{{ productLocation }}</td>
+          </tr>
+          <tr>
+            <td>Top Rated</td>
+            <td>{{ productReturnsAccepted }} Within {{ productReturnsWithin }}</td>
+          </tr>
+          <tr>
+            <td>Store Name</td>
+            <td>{{ productLocation }}</td>
+          </tr>
+          <tr>
+            <td>Buy Product At</td>
+            <td>{{ productLocation }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="currentSection === 'similarItems'">
+      <div class="similar-items">
+        <h3>Similar Items</h3>
+        <div class="card" *ngFor="let item of similaritemsData.getSimilarItemsResponse.itemRecommendations.item; let i = index" [hidden]="i >= maxItemsToShow">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                  <img [src]="item.imageURL" alt="Item Image" class="img-fluid">
+                </div>
+                <div class="col-md-8">
+                  <p class="card-text"><a [href]="item.viewItemURL" target="_blank">{{ item.title }}</a></p>
+                  <p class="card-text">Price: ${{ item.buyItNowPrice.__value__ }}</p>
+                  <p class="card-text">Shipping Cost: ${{ item.shippingCost.__value__ }}</p>
+                  <p class="card-text">Days Left: {{ extractTimeValue(item.timeLeft) }}</p>
+                </div>
+              </div>
+          </div>
+        </div>
+        <button *ngIf="maxItemsToShow < similarItems.length" (click)="showMoreItems()">Show More</button>
+        <button *ngIf="maxItemsToShow > 5" (click)="showLessItems()">Show Less</button>
+      </div>
+    </div>
+  </div>
+
+
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" *ngIf="isImageModalOpen">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Product Images</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeImageModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="imageCarousel" class="carousel slide" data-ride="carousel">
+          <ol class="carousel-indicators">
+            <li data-target="#imageCarousel" *ngFor="let image of productImages; let i = index" [attr.data-slide-to]="i" [class.active]="i === 0"></li>
+          </ol>
+
+          <div class="carousel-inner">
+            <div *ngFor="let image of productImage; let i = index" class="carousel-item" [class.active]="i === 0">
+              <img [src]="image" class="d-block w-100" alt="Product Image">
+            </div>
+          </div>
+
+          <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeImageModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+<!-- <div *ngIf="ebayData">
+  <h2>Results from eBay API:</h2>
+
+    <ul>
+      <li *ngFor="let item of ebayData.findItemsAdvancedResponse[0].searchResult[0].item">
+        {{ item.title[0] || 'N/A' }}
+        <ul>
+          <li>
+            {{ item.galleryURL[0] || 'N/A' }}
+          </li>
+          <li>
+            {{ item.sellingStatus[0].currentPrice[0].__value__ || 'N/A' }}
+          </li>
+          <li>
+            {{ item.shippingInfo[0].shippingServiceCost[0].__value__ || 'N/A' }}
+          </li>
+          <li>
+            {{ item.postalCode || 'N/A' }}
+          </li>
+
+          <ul>
+            <li>
+              {{ item.shippingInfo[0].shippingServiceCost[0].__value__ || 'N/A' }}
+            </li>
+            <li>
+              {{ item.shippingInfo[0].shipToLocation || 'N/A' }}
+            </li>
+            <li>
+              {{ item.shippingInfo[0].handlingTime || 'N/A' }}
+            </li>
+            <li>
+              {{ item.shippingInfo[0].expeditedShipping || 'N/A' }}
+            </li>
+            <li>
+              {{ item.shippingInfo[0].oneDayShippingAvailable || 'N/A' }}
+            </li>
+            <li>
+              {{ item.returnsAccepted || 'N/A' }}
+            </li>
+
+            <ul>
+              <li>
+                {{ item.sellerInfo[0].feedbackScore || 'N/A' }}
+              </li>
+              <li>
+                {{ item.sellerInfo[0].positiveFeedbackPercent || 'N/A' }}
+              </li>
+              <li>
+                {{ item.sellerInfo[0].feedbackRatingStar || 'N/A' }}
+              </li>
+              <li>
+                {{ item.sellerInfo[0].topRatedSeller || 'N/A' }}
+              </li>
+              <li>
+                {{ item && item.storeInfo && item.storeInfo[0]?.storeName || 'N/A' }}
+              </li>
+              <li>
+                {{ item && item.storeInfo && item.storeInfo[0]?.storeURL || 'N/A' }}
+              </li>
+            </ul>
+          </ul>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="postalcodeData">
+    <h1>Postal Code Data</h1>
+    <ul>
+      <li *ngFor="let item of postalcodeData.postalCodes">
+        {{ item.postalCode }}
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="productinfoData">
+    <h1>Product Info Data</h1>
+      <div *ngFor="let item of productinfoData.Item | keyvalue">
+        <ng-container *ngIf="item.key === 'PictureURL'">
+          Key: {{ item.key }}, Value: {{ item.value }}
+        </ng-container>
+        <ng-container *ngIf="item.key === 'currentPrice'">
+          Key: {{ item.key }}, Value: {{ item.value }}
+        </ng-container>
+        <ng-container *ngIf="item.key === 'Location'">
+          Key: {{ item.key }}, Value: {{ item.value }}
+        </ng-container>
+        <ng-container *ngIf="item.key === 'ReturnPolicy'">
+          <div *ngFor="let item of productinfoData.Item.ReturnPolicy | keyvalue">
+            Key: {{ item.key }}, Value: {{ item.value }}
+          </div>
+        </ng-container>
+        <ng-container *ngIf="item.key === 'ItemSpecifics'">
+          <ul>
+            <li *ngFor="let item of productinfoData.Item.ItemSpecifics.NameValueList">
+              {{ item.Name }} : {{ item.Value }}
+            </li>
+          </ul>
+        </ng-container>
+      </div>
+  </div>
+
+  <div *ngIf="photosData">
+    <h1>Photos Data</h1>
+    <ul>
+      <li *ngFor="let item of photosData.items">
+        {{ item.link }}
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="similaritemsData">
+    <h1>Similar Items Data</h1>
+    <ul>
+      <li *ngFor="let item of similaritemsData.getSimilarItemsResponse.itemRecommendations.item">
+        {{ item.title }}
+        <ul>
+          <li>
+            {{ item.viewItemURL }}
+          </li>
+          <li>
+            {{ item.buyItNowPrice.__value__ }}
+          </li>
+          <li>
+            {{ item.shippingCost.__value__ }}
+          </li>
+          <li>
+            {{ extractTimeValue(item.timeLeft) }}
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div> -->
