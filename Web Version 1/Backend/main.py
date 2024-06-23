@@ -6,8 +6,8 @@ from ebay_oauth_token import OAuthToken
 app = Flask(__name__)
 CORS(app)
 
-EBAY_API_KEY = 'DanushGu-webtech0-PRD-294557f6d-e58fb9a5'
-client_secret = "PRD-94557f6d0f0a-a0a3-40c6-abdc-8982"
+EBAY_API_KEY = 'EBAY_API_KEY'
+client_secret = "client_secret"
 
 oauth_utility = OAuthToken(EBAY_API_KEY, client_secret)
 application_token = oauth_utility.getApplicationToken()
