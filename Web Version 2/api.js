@@ -97,8 +97,8 @@ app.get('/api/ebaydata', async (req, res) => {
 
 const OAuthToken = require('./ebay_oauth_token');
 
-const client_id = 'DanushGu-webtech0-PRD-294557f6d-e58fb9a5';
-const client_secret = 'PRD-94557f6d0f0a-a0a3-40c6-abdc-8982';
+const client_id = 'client_id';
+const client_secret = 'client_secret';
 
 const oauthToken = new OAuthToken(client_id, client_secret);
 
@@ -113,7 +113,7 @@ oauthToken.getApplicationToken()
 
         const itemid = req.query.itemid;
 
-        const apiUrl = `https://open.api.ebay.com/shopping?callname=GetSingleItem&responseencoding=JSON&appid=DanushGu-webtech0-PRD-294557f6d-e58fb9a5&siteid=0&version=967&ItemID=${itemid}&IncludeSelector=Description,Details,ItemSpecifics`;
+        const apiUrl = `https://open.api.ebay.com/shopping?callname=GetSingleItem&responseencoding=JSON&appid=appid&siteid=0&version=967&ItemID=${itemid}&IncludeSelector=Description,Details,ItemSpecifics`;
     
         const response = await axios.get(apiUrl, {headers});
     
@@ -166,7 +166,7 @@ app.get('/api/photos', async (req, res) => {
 app.get('/api/similaritems', async (req, res) => {
   try {
     const itemid = req.query.itemid;
-    const apiUrl = `https://svcs.ebay.com/MerchandisingService?OPERATION-NAME=getSimilarItems&SERVICE-NAME=MerchandisingService&SERVICE-VERSION=1.1.0&CONSUMER-ID=DanushGu-webtech0-PRD-294557f6d-e58fb9a5&RESPONSE-DATA-FORMAT=JSON&REST-PAYLOAD&itemId=${itemid}&maxResults=20`;
+    const apiUrl = `https://svcs.ebay.com/MerchandisingService?OPERATION-NAME=getSimilarItems&SERVICE-NAME=MerchandisingService&SERVICE-VERSION=1.1.0&CONSUMER-ID=CONSUMER-ID&RESPONSE-DATA-FORMAT=JSON&REST-PAYLOAD&itemId=${itemid}&maxResults=20`;
 
     const response = await axios.get(apiUrl);
 
