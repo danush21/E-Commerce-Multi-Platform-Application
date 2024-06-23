@@ -1,0 +1,11 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="50dp"
+    android:height="50dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Your SVG Path here -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M19,10H5V8H19V10M19,16H5V14H19V16Z" />
+</vector>

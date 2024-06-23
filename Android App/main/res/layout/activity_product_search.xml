@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Search and Wishlist Buttons -->
+    <LinearLayout
+        android:id="@+id/buttonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Search Button -->
+        <Button
+            android:id="@+id/tabSearch"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Search"
+            android:background="#490049" />
+
+        <!-- Wishlist Button -->
+        <Button
+            android:id="@+id/tabWishlist"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Wishlist"
+            android:background="#490049" />
+    </LinearLayout>
+
+    <!-- Form Layout -->
+    <include layout="@layout/search_form" />
+
+</LinearLayout>

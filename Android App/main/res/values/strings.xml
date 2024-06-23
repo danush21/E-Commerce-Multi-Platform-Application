@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">eBay</string>
+
+    <string name="error_empty_keyword">Please enter mandatory field</string>
+
+    <string-array name="sort_parameters_array">
+        <item>Name</item>
+        <item>Price</item>
+        <item>Days</item>
+        <item>Default</item>
+    </string-array>
+
+    <string-array name="sort_order_array">
+        <item>Ascending</item>
+        <item>Descending</item>
+    </string-array>
+</resources>

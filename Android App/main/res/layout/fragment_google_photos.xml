@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+    <!-- ImageViews to display photos -->
+    <ImageView
+        android:id="@+id/image_view_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_margin="8dp"/>
+
+    <ImageView
+        android:id="@+id/image_view_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_margin="8dp"/>
+
+    <ImageView
+        android:id="@+id/image_view_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_margin="8dp"/>
+
+    <ImageView
+        android:id="@+id/image_view_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_margin="8dp"/>
+
+    <ImageView
+        android:id="@+id/image_view_5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_margin="8dp"/>
+
+    <ImageView
+        android:id="@+id/image_view_6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_margin="8dp"/>
+
+    <ImageView
+        android:id="@+id/image_view_7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_margin="8dp"/>
+
+    <ImageView
+        android:id="@+id/image_view_8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:layout_margin="8dp"/>
+
+    <!-- Add more ImageViews for additional photos if needed -->
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
