@@ -1,0 +1,149 @@
+.ebay{
+    display: flex;
+    justify-content: center;
+}
+
+.ebay img{
+    height: 70px;
+    width: 140px;
+}
+
+.ebay p{
+    margin-top: 0;
+    font-size: 30pt;
+    font-weight: bolder;
+    padding-top: 14px;
+}
+
+.search table{
+    display: flex;
+    justify-content: center ;
+    border-collapse: collapse;
+}
+
+.search td{
+    border: 1px solid;
+    width: 500px;
+    height: 35px;
+    text-align: center;
+}
+
+.search select{
+    text-align: center;
+}
+
+.count p{
+    font-size: 25pt;
+    font-weight: bolder;
+    padding-top: 10px;
+    text-align: center;
+}
+
+.results{
+    display: flex;
+    justify-content: center ;
+    padding-bottom: 4px;
+}
+
+.results table{
+    border-radius: 5px;
+    background-color: #e0e0e0;
+    width: 800px;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.results table:hover{
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.4);
+}
+
+.left{
+    display: flex;
+    align-items: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.left img{
+    display: block;
+    max-width: 240px;
+    border-style: solid;
+    border-width: 3px;
+    border-color: gray;
+    margin: 0 auto;
+    transition: transform 0.3s ease-in-out;
+    height: 120px;
+}
+
+.left img:hover{
+    transform: scale(2.0);
+}
+
+.right{
+    width: 70%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.row{
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.row img{
+    height: 30px;
+    padding-left: 10px;
+}
+
+.ellipsis {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 530px;
+}
+
+.show{
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+button{
+    background-color: #e0e0e0;
+    border-width: 0pt;
+    border-radius: 4pt;
+    padding-top: 4pt;
+    padding-bottom: 4pt;
+}
+
+button:hover{
+    background-color: #199c10;
+    color: white;
+}
+
+#showMoreButton, #showLessButton {
+    display: block;
+    margin: 0 auto;
+}
+
+#itemdetails {
+    text-align: center;
+}
+
+#image{
+    max-width: 300px;
+    max-height: 180px;
+}
+
+#info {
+    width: 50%;
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#info td {
+    border: 1px solid gray;
+    text-align: left;
+}

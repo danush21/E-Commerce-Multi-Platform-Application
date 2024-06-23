@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<head>
+    <title>EBay</title>
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
+</head>
+<body>
+    <div class="ebay">
+        <a href="https://www.ebay.com/" target="_blank"><img src="https://csci571.com/hw/hw6/images/eBayLogo.png"></a>
+        <p>Shopping</p>
+    </div>
+
+    <div class="search">
+        <form id="ebayform">
+            <table>
+                <tr>
+                    <td><b>Keywords<span style="color:#FF0000">*</span>: </b><input type="text" id="query" required></td>
+                </tr>
+                <tr>
+                    <td><b>Price Range: </b>From <input type="number" id="price_range_from" style="width: 70px;"> to <input type="number" id="price_range_to" style="width: 70px;"></td>
+                </tr>
+                <tr>
+                    <td><b>Condition: </b><input type="checkbox" class="condition" id="condition1000" value="1000"> New <input type="checkbox" class="condition" id="condition3000" value="3000"> Used <input type="checkbox" class="condition" id="condition4000" value="4000"> Very Good <input type="checkbox" class="condition" id="condition5000" value="5000"> Good <input type="checkbox" class="condition" id="condition6000" value="6000"> Acceptable </td>
+                </tr>
+                <tr>
+                    <td><b>Seller: </b><input type="checkbox" id="seller_returns_accepted" value="true"> Return Accepted</td>
+                </tr>
+                <tr>
+                    <td><b>Shipping: </b><input type="checkbox" id="free_shipping" value="true"> Free <input type="checkbox" id="expedited" value="expedited"> Expedited</td>
+                </tr>
+                <tr>
+                    <td><b>Sort by: </b><select id="sort_order">
+                        <option value="BestMatch">Best Match</option>
+                        <option value="CurrentPriceHighest">Price: highest first</option>
+                        <option value="PricePlusShippingHighest">Price + Shipping: highest first</option>
+                        <option value="PricePlusShippingLowest">Price + Shipping: lowest first</option>
+                    </select></td>
+                </tr>
+                <tr>
+                    <td><button type="button" onclick="clearEbay()">Clear</button> <button type="submit">Search</button></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <div id="results">
+    </div>
+    <div id="itemdetails" style="display: none;">
+        <div class="count"><p>Item Details</p></div>
+        <button type="button" id="showResultsButton">Back to search results</button>
+        <div><br><table id="info" style="border-collapse: collapse; align-items: center;">
+            <tr>
+                <td><b>Photo</b></td>
+                <td><img id="image" src="" alt="Product Image"></td>
+            </tr>
+            <tr>
+                <td><b>eBay Link</b></td>
+                <td><a id="link" href="#" target="_blank">Ebay Product Link</a></td>
+            </tr>
+            <tr>
+                <td><b>Title</b></td>
+                <td id="title"></td>
+            </tr>
+            
+            <tr>
+                <td><b>Price</b></td>
+                <td id="price"></td>
+            </tr>
+            <tr>
+                <td><b>Location</b></td>
+                <td id="location"></td>
+            </tr>
+            <tr>
+                <td><b>Seller</b></td>
+                <td id="seller"></td>
+            </tr>
+            <tr>
+                <td><b>Return Policy(US)</b></td>
+                <td id="returnPolicy"></td>
+            </tr>
+        </table></div>
+    </div>
+    <button type="button" id="showMoreButton" style="display: none;">Show More</button>
+    <button type="button" id="showLessButton" style="display: none;">Show Less</button>
+    
+    <script>
+
+        let resultsToShow = 3;
+        const showMoreButton = document.getElementById('showMoreButton');
+        const showLessButton = document.getElementById('showLessButton');
+
+        let dataCache = null;
+        const resultsContainer = document.getElementById('results');
+
+        document.getElementById('ebayform').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const query = document.getElementById('query').value.trim();
+            if (query) {
+
+                const price_range_from = document.getElementById('price_range_from').value;
+                const price_range_to = document.getElementById('price_range_to').value;
+
+                if (isNaN(price_range_from) || price_range_from < 0.0 || isNaN(price_range_to) || price_range_to < 0.0) {
+                    alert('Price Range values cannot be negative! Please try a value greater than or equal to 0.0');
+                }
+                else if (price_range_from > price_range_to) {
+                    alert('Oops! Lower price limit cannot be greater than upper price limit!\nPlease try again.');
+                }
+                else if (!isNaN(price_range_from) && !isNaN(price_range_to) && parseFloat(price_range_from) <= parseFloat(price_range_to) && parseFloat(price_range_from) >= 0.0 && parseFloat(price_range_to) >= 0.0) {
+                    searchEbay();
+                }
+                else if(price_range_from === '' || price_range_to === '')
+                {
+                    searchEbay();
+                } 
+            }
+        });
+
+        function clearEbay() {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+            const queryInput = document.getElementById('query');
+            const priceRangeFromInput = document.getElementById('price_range_from');
+            const priceRangeToInput = document.getElementById('price_range_to');
+            queryInput.value = "";
+            priceRangeFromInput.value = "";
+            priceRangeToInput.value = "";
+            const checkboxes = document.querySelectorAll('.condition');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            const seller_returns_accepted = document.getElementById('seller_returns_accepted');
+            seller_returns_accepted.checked = false;
+            const free_shipping = document.getElementById('free_shipping');
+            free_shipping.checked = false;
+            const expedited = document.getElementById('expedited');
+            expedited.checked = false;
+            const dropdown = document.getElementById('sort_order');
+            dropdown.selectedIndex = 0;
+            showMoreButton.style.display = 'none';
+            showLessButton.style.display = 'none';
+            itemdetails.style.display = 'none';
+        }
+        
+        function searchEbay() {
+            dataCache = null;
+            if(!dataCache){
+                const query = document.getElementById('query').value;
+                const price_range_from = document.getElementById('price_range_from').value;
+                const price_range_to = document.getElementById('price_range_to').value;
+                const seller_returns_accepted = document.getElementById('seller_returns_accepted').checked;
+                const free_shipping = document.getElementById('free_shipping').checked;
+                const expedited = document.getElementById('expedited').checked;
+                const sort_order = document.getElementById('sort_order').value;
+
+                const conditionValues = ["1000", "3000", "4000", "5000", "6000"];
+                const selectedConditions = conditionValues.filter(value => {
+                    const checkbox = document.getElementById(`condition${value}`);
+                    return checkbox.checked;
+                });
+                let conditionParam = '';
+                if (selectedConditions.length > 0) {
+                    conditionParam = '&condition=' + selectedConditions.join('&condition=');
+                }
+
+                let apiurl = `/search?query=${query}&sort_order=${sort_order}`;
+
+                if(price_range_from){
+                    apiurl += `&price_range_from=${price_range_from}`;
+                }
+
+                if(price_range_to){
+                    apiurl += `&price_range_to=${price_range_to}`;
+                }
+
+                if(seller_returns_accepted){
+                    apiurl += `&seller_returns_accepted=${seller_returns_accepted}`;
+                }
+
+                if(free_shipping){
+                    apiurl += `&free_shipping=${free_shipping}`;
+                }
+
+                apiurl += `${conditionParam}`;
+
+                fetch(apiurl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data == null){
+                            resultsContainer.innerHTML = '<div class="count"><p>No Results found</p></div>';
+                            showMoreButton.style.display = 'none';
+                            showLessButton.style.display = 'none';
+                        }
+                        dataCache = data;
+                        resultsContainer.innerHTML = '';
+                        resultsToShow = 3;
+                        displayEbay();
+                    })    
+                    
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+
+        function displayEbay(){
+            resultsContainer.innerHTML = '';
+            const query = document.getElementById('query').value;
+            if (dataCache.total_results > 0) {
+                const totalResults = dataCache.total_results;
+                resultsContainer.innerHTML += `<div class="count"><p>${totalResults} Results found for <i>${query}</i></p><hr width="800px"></div>`;
+                
+                if(dataCache.items.length>0){
+                    dataCache.items.slice(0, resultsToShow).forEach(item => {
+                        const title = item.title;
+                        const price = item.price;
+                        const imageURL = item.image_url;
+                        const categoryName = item.category;
+                        const condition = item.condition;
+                        const shippingPrice = item.shipping_cost;
+                        const topRated = item.top_rated;
+                        const shipping_cost = item.shipping_cost;
+                        const itemId = item.itemId;
+
+                        const itemDiv = document.createElement('div');
+
+                        itemDiv.innerHTML = `
+                        <div class="results" id="${itemId}">
+                            <table>
+                                <tr>
+                                    <td class="left"><img src="${imageURL}"></td>
+                                    <td class="right">
+                                        <div class="row ellipsis"><b>${title}</b></div>
+                                        <div class="row">Category: ${categoryName} <img class="redirect" src="https://csci571.com/hw/hw6/images/redirect.png" style="height:15px"></div>
+                                        <div class="row">Condition: ${condition} ${topRated === 'true' ? ' <img src="https://csci571.com/hw/hw6/images/topRatedImage.png">' : ''}</div>
+                                        <div class="row"><b>Price: $${price}${shipping_cost > 0.01 ? ` (+ $${shipping_cost} for shipping)` : ''}</b></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        `;
+                        resultsContainer.appendChild(itemDiv);
+
+                        itemDiv.addEventListener('click', () => {
+                            showItemDetails(itemId);
+                        });
+
+                });
+
+                } else {
+                            resultsContainer.innerHTML = '<div class="count"><p>No results found</p></div>';
+                            showMoreButton.style.display = 'none';
+                            showLessButton.style.display = 'none';
+                        }
+                            
+                        } else {
+                            resultsContainer.innerHTML = '<div class="count"><p>No results found</p></div>';
+                            showMoreButton.style.display = 'none';
+                            showLessButton.style.display = 'none';
+                        }
+
+                if (dataCache.items.length > resultsToShow) {
+                    showMoreButton.style.display = 'block';
+                } else {
+                    showMoreButton.style.display = 'none';
+                }
+
+                if (resultsToShow > 3) {
+                    showLessButton.style.display = 'block';
+                } else {
+                    showLessButton.style.display = 'none';
+                }
+        }
+
+        showMoreButton.addEventListener('click', () => {
+            resultsToShow += 7;
+            displayEbay();
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+
+        showLessButton.addEventListener('click', () => {
+            resultsToShow = 3;
+            displayEbay();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+
+        function showItemDetails(itemId) {
+            fetch(`/getitem?query=${itemId}`)
+                .then(response => response.json())
+                .then(data => {
+
+                    const productData = data[0];
+                    document.getElementById('results').style.display = 'none';
+                    itemdetails.style.display = 'block';
+                    populateTable(productData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            showMoreButton.style.display = 'none';
+            showLessButton.style.display = 'none';
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function populateTable(productData) {
+            document.getElementById("link").href = productData.link;
+            document.getElementById("title").textContent = productData.title;
+            document.getElementById("image").src = productData.image_url;
+            document.getElementById("price").textContent = `$${productData.price.toFixed(2)}`;
+            document.getElementById("location").textContent = productData.location;
+            document.getElementById("seller").textContent = productData.seller;
+
+            const returnPolicy = productData.return_policy;
+            const returnPolicyText = `${returnPolicy.Refund}, ${returnPolicy.ReturnsAccepted}, Return Within ${returnPolicy.ReturnsWithin}, Shipping Cost Paid By ${returnPolicy.ShippingCostPaidBy}`;
+            document.getElementById("returnPolicy").textContent = returnPolicyText;
+
+            const itemSpecifics = productData.item_specifics;
+            const table = document.getElementById("info");
+
+            itemSpecifics.forEach(item => {
+                const row = document.createElement("tr");
+                const nameCell = document.createElement("td");
+                const valueCell = document.createElement("td");
+                
+                nameCell.innerHTML = `<b>${item.Name}</b>`;
+                valueCell.textContent = item.Value.join(", ");
+
+                row.appendChild(nameCell);
+                row.appendChild(valueCell);
+                table.appendChild(row);
+            });
+        }
+
+        const showResultsButton = document.getElementById('showResultsButton');
+        showResultsButton.addEventListener('click', function () {
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('itemdetails').style.display = 'none';
+            if (resultsToShow > 3) {
+                showLessButton.style.display = 'block';
+                showMoreButton.style.display = 'none';
+            } else {
+                showLessButton.style.display = 'none';
+                showMoreButton.style.display = 'block';
+            }
+        });
+
+    </script>
+</body>
